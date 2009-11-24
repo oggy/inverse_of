@@ -11,14 +11,22 @@ begin
     gem.homepage = "http://github.com/oggy/inverse_of"
     gem.authors = ["George Ogata"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
 end
 
+require 'rake/testtask'
 require 'spec/rake/spectask'
+
+desc "Run the test/unit tests for inverse associations, backported from ActiveRecord 3."
+Rake::TestTask.new(:test => :check_dependencies) do |test|
+  test.libs << 'lib' << 'test'
+  test.pattern = 'test/**/*_test.rb'
+  test.verbose = true
+end
+
 Spec::Rake::SpecTask.new(:spec) do |spec|
   spec.libs << 'lib' << 'spec'
   spec.spec_files = FileList['spec/**/*_spec.rb']
