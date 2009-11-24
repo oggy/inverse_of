@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "inverse_of"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = "Backport of ActiveRecord 3.0's inverse associations."
+    gem.description = "Backport of ActiveRecord 3.0's inverse associations."
     gem.email = "george.ogata@gmail.com"
     gem.homepage = "http://github.com/oggy/inverse_of"
     gem.authors = ["George Ogata"]

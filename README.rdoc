@@ -1,4 +1,4 @@
-= inverse_of
+= Inverse Of
 
 Description goes here.
 
