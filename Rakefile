@@ -10,7 +10,6 @@ begin
     gem.email = "george.ogata@gmail.com"
     gem.homepage = "http://github.com/oggy/inverse_of"
     gem.authors = ["George Ogata"]
-    gem.add_development_dependency "rspec", ">= 1.2.9"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
