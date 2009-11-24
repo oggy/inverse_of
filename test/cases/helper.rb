@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'ruby-debug'
 require 'active_record'
 require 'active_record/test_case'
 require 'active_record/fixtures'
