@@ -22,8 +22,10 @@ module InverseOf
       end
 
       def check_validity_of_inverse!
-        if has_inverse? && inverse_of.nil?
-          raise InverseOfAssociationNotFoundError.new(self)
+        unless options[:polymorphic]
+          if has_inverse? && inverse_of.nil?
+            raise InverseOfAssociationNotFoundError.new(self)
+          end
         end
       end
 
@@ -34,6 +36,14 @@ module InverseOf
       def inverse_of
         if has_inverse?
           @inverse_of ||= klass.reflect_on_association(options[:inverse_of])
+        else
+          nil
+        end
+      end
+
+      def polymorphic_inverse_of(associated_class)
+        if has_inverse?
+          associated_class.reflect_on_association(options[:inverse_of])
         else
           nil
         end
@@ -125,6 +135,39 @@ module InverseOf
       end
     end
 
+    module BelongsToPolymorphicAssociation
+      def self.included(base)
+        base.alias_method_chain :replace, :inverse_of
+        base.alias_method_chain :find_target, :inverse_of
+      end
+
+      def replace_with_inverse_of(record)
+        replace_without_inverse_of(record)
+        set_inverse_instance(record, @owner)
+        record
+      end
+
+      def find_target_with_inverse_of
+        target = find_target_without_inverse_of and
+          set_inverse_instance(target, @owner)
+        target
+      end
+
+      # NOTE - for now, we're only supporting inverse setting from belongs_to back onto
+      # has_one associations.
+      def we_can_set_the_inverse_on_this?(record)
+        @reflection.has_inverse?
+      end
+
+      def set_inverse_instance(record, instance)
+        return if record.nil? || !we_can_set_the_inverse_on_this?(record)
+        inverse_relationship = @reflection.polymorphic_inverse_of(record.class)
+        unless inverse_relationship.nil?
+          record.send(:"set_#{inverse_relationship.name}_target", instance)
+        end
+      end
+    end
+
     module HasManyAssociation
       def we_can_set_the_inverse_on_this?(record)
         inverse = @reflection.inverse_of
@@ -175,6 +218,7 @@ ActiveRecord::InverseOfAssociationNotFoundError = InverseOf::InverseOfAssociatio
 ActiveRecord::Associations::AssociationCollection.send :include, InverseOf::Associations::AssociationCollection
 ActiveRecord::Associations::AssociationProxy.send :include, InverseOf::Associations::AssociationProxy
 ActiveRecord::Associations::BelongsToAssociation.send :include, InverseOf::Associations::BelongsToAssociation
+ActiveRecord::Associations::BelongsToPolymorphicAssociation.send :include, InverseOf::Associations::BelongsToPolymorphicAssociation
 ActiveRecord::Associations::HasManyAssociation.send :include, InverseOf::Associations::HasManyAssociation
 ActiveRecord::Associations::HasManyThroughAssociation.send :include, InverseOf::Associations::HasManyThroughAssociation
 ActiveRecord::Associations::HasOneAssociation.send :include, InverseOf::Associations::HasOneAssociation

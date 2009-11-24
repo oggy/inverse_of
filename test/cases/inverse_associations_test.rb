@@ -175,7 +175,7 @@ class InverseHasManyTests < ActiveRecord::TestCase
   end
 end
 
-class InverseBelongsToTests < ActiveRecord::TestCase
+class InverseMonomorphicBelongsToTests < ActiveRecord::TestCase
   fixtures :men, :faces, :interests
 
   def test_child_instance_should_be_shared_with_parent_on_find
@@ -228,11 +228,44 @@ class InverseBelongsToTests < ActiveRecord::TestCase
   end
 end
 
+class InversePolymorphicBelongsToTests < ActiveRecord::TestCase
+  fixtures :sponsors, :members, :clubs
+
+  def club_id
+    @club_id ||= Club.find_by_name('Moustache and Eyebrow Fancier Club').id
+  end
+
+  def test_parent_instance_should_be_shared_with_child_on_find
+    sponsor = Sponsor.find_by_club_id(club_id)
+    member = sponsor.sponsorable
+    assert_equal sponsor.club_id, member.sponsor.club_id, "Sponsor club ID should be the same before changes to parent instance"
+    sponsor.club_id = club_id + 1
+    assert_equal sponsor.club_id, member.sponsor.club_id, "Sponsor club ID should be the same after changes to parent instance"
+    member.sponsor.club_id = club_id + 2
+    assert_equal sponsor.club_id, member.sponsor.club_id, "Sponsor club ID should be the same after changes to child-owned instance"
+  end
+
+  def test_parent_instance_should_be_shared_with_replaced_child
+    sponsor = Sponsor.find_by_club_id(club_id)
+    old_member = sponsor.sponsorable
+    new_member = Member.create
+
+    assert_not_nil old_member
+    sponsor.sponsorable.replace(new_member)
+
+    assert_equal sponsor.club_id, new_member.sponsor.club_id, "Sponsor club ID should be the same before changes to parent instance"
+    sponsor.club_id = club_id + 1
+    assert_equal sponsor.club_id, new_member.sponsor.club_id, "Sponsor club ID should be the same after changes to parent instance"
+    new_member.sponsor.club_id = club_id + 2
+    assert_equal sponsor.club_id, new_member.sponsor.club_id, "Sponsor club ID should be the same after changes to replaced-parent-owned instance"
+  end
+end
+
 # NOTE - these tests might not be meaningful, ripped as they were from the parental_control plugin
 # which would guess the inverse rather than look for an explicit configuration option.
 class InverseMultipleHasManyInversesForSameModel < ActiveRecord::TestCase
   fixtures :men, :interests, :zines
-  
+
   def test_that_we_can_load_associations_that_have_the_same_reciprocal_name_from_different_models
     assert_nothing_raised(ActiveRecord::AssociationTypeMismatch) do
       i = Interest.find(:first)
