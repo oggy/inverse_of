@@ -190,12 +190,19 @@ module InverseOf
       def self.included(base)
         base.alias_method_chain :find_target, :inverse_of
         base.alias_method_chain :new_record, :inverse_of
+        base.alias_method_chain :replace, :inverse_of
       end
 
       def find_target_with_inverse_of
         target = find_target_without_inverse_of
         set_inverse_instance(target, @owner)
         target
+      end
+
+      def replace_with_inverse_of(record, dont_save = false)
+        value = replace_without_inverse_of(record, dont_save)
+        set_inverse_instance(record, @owner)
+        value
       end
 
       private
