@@ -219,6 +219,37 @@ module InverseOf
       end
     end
   end
+
+  module AssociationPreload
+    def self.included(base)
+      base.extend ClassMethods
+      base.metaclass.alias_method_chain :add_preloaded_records_to_collection, :inverse_of
+      base.metaclass.alias_method_chain :set_association_single_records, :inverse_of
+    end
+
+    module ClassMethods
+      def add_preloaded_records_to_collection_with_inverse_of(parent_records, reflection_name, associated_record)
+        value = add_preloaded_records_to_collection_without_inverse_of(parent_records, reflection_name, associated_record)
+        parent_records.each do |parent_record|
+          association_proxy = parent_record.send(reflection_name)
+          association_proxy.__send__(:set_inverse_instance, associated_record, parent_record)
+        end
+        value
+      end
+
+      def set_association_single_records_with_inverse_of(id_to_record_map, reflection_name, associated_records, key)
+        value = set_association_single_records_without_inverse_of(id_to_record_map, reflection_name, associated_records, key)
+        associated_records.each do |associated_record|
+          mapped_records = id_to_record_map[associated_record[key].to_s]
+          mapped_records.each do |mapped_record|
+            association_proxy = mapped_record.send(reflection_name)
+            association_proxy.__send__(:set_inverse_instance, associated_record, mapped_record)
+          end
+        end
+        value
+      end
+    end
+  end
 end
 
 ActiveRecord::InverseOfAssociationNotFoundError = InverseOf::InverseOfAssociationNotFoundError
@@ -230,6 +261,7 @@ ActiveRecord::Associations::HasManyAssociation.send :include, InverseOf::Associa
 ActiveRecord::Associations::HasManyThroughAssociation.send :include, InverseOf::Associations::HasManyThroughAssociation
 ActiveRecord::Associations::HasOneAssociation.send :include, InverseOf::Associations::HasOneAssociation
 ActiveRecord::Reflection.send :include, InverseOf::Reflection
+ActiveRecord::Base.send :include, InverseOf::AssociationPreload
 
 module ActiveRecord::Associations::ClassMethods
   @@valid_keys_for_has_many_association << :inverse_of
