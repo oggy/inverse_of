@@ -218,6 +218,22 @@ module InverseOf
         return !inverse.nil?
       end
     end
+
+    module ClassMethods
+      module JoinDependency
+        def self.included(base)
+          base.alias_method_chain :construct_association, :inverse_of
+        end
+
+        def construct_association_with_inverse_of(record, join, row)
+          value = construct_association_without_inverse_of(record, join, row)
+          association_proxy = record.send(join.reflection.name)
+          association = join.instantiate(row) unless join.reflection.macro == :has_one && row[join.aliased_primary_key].nil?
+          association_proxy.__send__(:set_inverse_instance, association, record)
+          value
+        end
+      end
+    end
   end
 
   module AssociationPreload
@@ -260,6 +276,7 @@ ActiveRecord::Associations::BelongsToPolymorphicAssociation.send :include, Inver
 ActiveRecord::Associations::HasManyAssociation.send :include, InverseOf::Associations::HasManyAssociation
 ActiveRecord::Associations::HasManyThroughAssociation.send :include, InverseOf::Associations::HasManyThroughAssociation
 ActiveRecord::Associations::HasOneAssociation.send :include, InverseOf::Associations::HasOneAssociation
+ActiveRecord::Associations::ClassMethods::JoinDependency.send :include, InverseOf::Associations::ClassMethods::JoinDependency
 ActiveRecord::Reflection.send :include, InverseOf::Reflection
 ActiveRecord::Base.send :include, InverseOf::AssociationPreload
 
