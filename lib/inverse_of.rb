@@ -157,7 +157,7 @@ if ActiveRecord::VERSION::MAJOR < 3
         # NOTE - for now, we're only supporting inverse setting from belongs_to back onto
         # has_one associations.
         def we_can_set_the_inverse_on_this?(record)
-          @reflection.has_inverse?
+          @reflection.has_inverse? && @reflection.polymorphic_inverse_of(record.class).macro == :has_one
         end
 
         def set_inverse_instance(record, instance)
@@ -227,11 +227,10 @@ if ActiveRecord::VERSION::MAJOR < 3
           end
 
           def construct_association_with_inverse_of(record, join, row)
-            value = construct_association_without_inverse_of(record, join, row)
+            association = construct_association_without_inverse_of(record, join, row) or
+              return nil
             association_proxy = record.send(join.reflection.name)
-            association = join.instantiate(row) unless join.reflection.macro == :has_one && row[join.aliased_primary_key].nil?
             association_proxy.__send__(:set_inverse_instance, association, record)
-            value
           end
         end
       end
