@@ -1,8 +1,8 @@
 if ActiveRecord::VERSION::MAJOR < 3
   module InverseOf
     class InverseOfAssociationNotFoundError < ActiveRecord::ActiveRecordError #:nodoc:
-      def initialize(reflection)
-        super("Could not find the inverse association for #{reflection.name} (#{reflection.options[:inverse_of].inspect} in #{reflection.class_name})")
+      def initialize(reflection, associated_class = nil)
+        super("Could not find the inverse association for #{reflection.name} (#{reflection.options[:inverse_of].inspect} in #{associated_class.nil? ? reflection.class_name : associated_class.name})")
       end
     end
 
@@ -37,16 +37,16 @@ if ActiveRecord::VERSION::MAJOR < 3
         def inverse_of
           if has_inverse?
             @inverse_of ||= klass.reflect_on_association(options[:inverse_of])
-          else
-            nil
           end
         end
 
         def polymorphic_inverse_of(associated_class)
           if has_inverse?
-            associated_class.reflect_on_association(options[:inverse_of])
-          else
-            nil
+            if inverse_relationship = associated_class.reflect_on_association(options[:inverse_of])
+              inverse_relationship
+            else
+              raise InverseOfAssociationNotFoundError.new(self, associated_class)
+            end
           end
         end
       end
