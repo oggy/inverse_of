@@ -1,4 +1,4 @@
-if ActiveRecord::VERSION::MAJOR < 3
+if ([ActiveRecord::VERSION::MAJOR, ActiveRecord::VERSION::MINOR, ActiveRecord::VERSION::TINY] <=> [2, 3, 6]) < 0
   module InverseOf
     class InverseOfAssociationNotFoundError < ActiveRecord::ActiveRecordError #:nodoc:
       def initialize(reflection, associated_class = nil)
