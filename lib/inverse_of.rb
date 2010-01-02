@@ -210,7 +210,7 @@ if ActiveRecord::VERSION::MAJOR < 3
 
         def new_record_with_inverse_of(replace_existing, &block)
           record = new_record_without_inverse_of(replace_existing, &block)
-          set_inverse_instance(record, @owner)
+          set_inverse_instance(record, @owner) unless replace_existing
           record
         end
 
