@@ -255,7 +255,6 @@ class InverseHasManyTests < ActiveRecord::TestCase
       i.man.name = 'Mungo'
       assert_equal m.name, i.man.name, "Name of man should be the same after changes to child-owned instance"
     end
-
   end
 
   def test_parent_instance_should_be_shared_with_newly_built_child
@@ -473,7 +472,6 @@ class InversePolymorphicBelongsToTests < ActiveRecord::TestCase
     assert_equal f.description, m.polymorphic_face.description, "Description of face should be the same after changes to child instance"
     m.polymorphic_face.description = 'pleasing'
     assert_equal f.description, m.polymorphic_face.description, "Description of face should be the same after changes to parent-owned instance"
-
 
     f = Face.find(:first, :conditions => {:description => 'confused'}, :include => :man, :order => 'men.id')
     m = f.polymorphic_man
