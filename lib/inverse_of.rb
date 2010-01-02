@@ -149,15 +149,20 @@ if ActiveRecord::VERSION::MAJOR < 3
         end
 
         def find_target_with_inverse_of
-          target = find_target_without_inverse_of and
-            set_inverse_instance(target, @owner)
+          target = find_target_without_inverse_of
+          set_inverse_instance(target, @owner)
           target
         end
 
         # NOTE - for now, we're only supporting inverse setting from belongs_to back onto
         # has_one associations.
         def we_can_set_the_inverse_on_this?(record)
-          @reflection.has_inverse? && @reflection.polymorphic_inverse_of(record.class).macro == :has_one
+          if @reflection.has_inverse?
+            inverse_association = @reflection.polymorphic_inverse_of(record.class)
+            inverse_association && inverse_association.macro == :has_one
+          else
+            false
+          end
         end
 
         def set_inverse_instance(record, instance)
