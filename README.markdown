@@ -1,4 +1,4 @@
-= Inverse Of
+# Inverse Of
 
 Backport of ActiveRecord 2.3.6's inverse associations feature.
 
@@ -59,7 +59,7 @@ associations, including polymorphic `belongs_to`.  Behavior should
 exactly match Rails 2.3.6; please file any differences
 [as a bug](http://github.com/oggy/inverse_of/issues).
 
-== Contributing
+## Contributing
 
 * Bug reports: http://github.com/oggy/inverse_of/issues
 * Source: http://github.com/oggy/inverse_of
@@ -67,6 +67,6 @@ exactly match Rails 2.3.6; please file any differences
   * Ensure patch includes tests.
   * Leave the version alone, or bump it in a separate commit.
 
-== Copyright
+## Copyright
 
 Copyright (c) 2009-2010 George Ogata, released under the MIT license
