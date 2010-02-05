@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "inverse_of"
-    gem.summary = "Backport of ActiveRecord 3.0's inverse associations."
-    gem.description = "Backport of ActiveRecord 3.0's inverse associations."
+    gem.summary = "Backport of ActiveRecord 2.3.6's inverse associations."
+    gem.description = "Backport of ActiveRecord 2.3.6's inverse associations."
     gem.email = "george.ogata@gmail.com"
     gem.homepage = "http://github.com/oggy/inverse_of"
     gem.authors = ["George Ogata"]
@@ -19,7 +19,7 @@ end
 require 'rake/testtask'
 require 'spec/rake/spectask'
 
-desc "Run the test/unit tests for inverse associations, backported from ActiveRecord 3."
+desc "Run the test/unit tests for inverse associations, backported from ActiveRecord 2.3.6."
 Rake::TestTask.new(:test => :check_dependencies) do |test|
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/*_test.rb'
