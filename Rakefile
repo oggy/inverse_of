@@ -17,7 +17,6 @@ rescue LoadError
 end
 
 require 'rake/testtask'
-require 'spec/rake/spectask'
 
 desc "Run the test/unit tests for inverse associations, backported from ActiveRecord 2.3.6."
 Rake::TestTask.new(:test => :check_dependencies) do |test|
@@ -26,20 +25,7 @@ Rake::TestTask.new(:test => :check_dependencies) do |test|
   test.verbose = true
 end
 
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
-end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-end
-
-task :spec => :check_dependencies
-
-task :default => :spec
+task :default => :test
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
