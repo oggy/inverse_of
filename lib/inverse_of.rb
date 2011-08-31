@@ -236,6 +236,7 @@ if ([ActiveRecord::VERSION::MAJOR, ActiveRecord::VERSION::MINOR, ActiveRecord::V
               return nil
             association_proxy = record.send(join.reflection.name)
             association_proxy.__send__(:set_inverse_instance, association, record)
+            return association
           end
         end
       end
