@@ -1,5 +1,5 @@
-if ([ActiveRecord::VERSION::MAJOR, ActiveRecord::VERSION::MINOR, ActiveRecord::VERSION::TINY] <=> [2, 3, 6]) < 0
-  module InverseOf
+module InverseOf
+  if ([ActiveRecord::VERSION::MAJOR, ActiveRecord::VERSION::MINOR, ActiveRecord::VERSION::TINY] <=> [2, 3, 6]) < 0
     class InverseOfAssociationNotFoundError < ActiveRecord::ActiveRecordError #:nodoc:
       def initialize(reflection, associated_class = nil)
         super("Could not find the inverse association for #{reflection.name} (#{reflection.options[:inverse_of].inspect} in #{associated_class.nil? ? reflection.class_name : associated_class.name})")
